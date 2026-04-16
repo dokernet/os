@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <stdbool.h>  
+#define MAX_PROCESSES 10
+#define MAX_RESOURCES 10
+int m, n;  
+int max[MAX_PROCESSES][MAX_RESOURCES], alloc[MAX_PROCESSES][MAX_RESOURCES], avl[MAX_RESOURCES], need[MAX_PROCESSES][MAX_RESOURCES], finish[MAX_PROCESSES];
+void computeneed() {
+for (int i = 0; i < m; i++) {
+for (int j = 0; j < n; j++) {
+need[i][j] = max[i][j] - alloc[i][j];
+}}
+}
+int isfeasible(int pno) {
+for (int j = 0; j < n; j++) {
+if (need[pno][j] > avl[j]) {
+return 0;  
+}}
+return 1;  
+}
+void checksystem() {
+int ans[m], cnt = 0;
+for (int i = 0; i < m; i++) {
+finish[i] = false;  
+}
+while (1) {
+int flag = 0;
+for (int i = 0; i < m; i++) {
+if (!finish[i] && isfeasible(i)) {
+finish[i] = true;
+ans[cnt++] = i;
+for (int j = 0; j < n; j++) {
+avl[j] += alloc[i][j];
+}
+flag = 1;
+}}
+if (!flag) break;
+}
+int safe = 1;
+for (int i = 0; i < m; i++) {
+if (!finish[i]) {
+safe = 0;
+break;
+}
+}
+if (safe) {
+printf("\nSystem is in safe state\nSafe sequence: ");
+for (int i = 0; i < cnt; i++) {
+printf("p%d ", ans[i]);
+}
+printf("\n");
+} else {
+printf("\nSystem is not in safe state\n");
+}}
+void acceptdata(int x[MAX_PROCESSES][MAX_RESOURCES]) {
+for (int i = 0; i < m; i++) {
+printf("Process p%d\n", i);
+for (int j = 0; j < n; j++) {
+printf("Resource %c: ", 65 + j);
+scanf("%d", &x[i][j]);
+}}
+}
+void acceptavailability() {
+for (int i = 0; i < n; i++) {
+printf("Resource %c: ", 65 + i);
+scanf("%d", &avl[i]);
+}
+}
+void displaydata()
+{
+printf("\n\tAllocation\t\tMax\t\tNeed\n");
+for (int i = 0; i < m; i++) {
+printf("p%d\t", i);
+for (int j = 0; j < n; j++) {
+printf("%4d", alloc[i][j]);
+}
+printf("\t");
+for (int j = 0; j < n; j++) {
+printf("%4d", max[i][j]);
+}
+printf("\t");
+for (int j = 0; j < n; j++) {
+printf("%4d", need[i][j]);
+}
+printf("\n");
+}
+printf("Available: ");
+for (int j = 0; j < n; j++) {
+printf("%4d", avl[j]);
+}
+printf("\n");
+}
+int main() {
+printf("Enter the number of processes and resources: ");
+scanf("%d %d", &m, &n);
+printf("Enter the allocation matrix:\n");
+acceptdata(alloc);
+printf("Enter the max matrix:\n");
+acceptdata(max);
+printf("Enter the available resources:\n");
+acceptavailability();
+computeneed(); 
+displaydata();  
+checksystem();  
+return 0;
+}
